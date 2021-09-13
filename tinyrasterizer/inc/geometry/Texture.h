@@ -1,8 +1,8 @@
 #ifndef __TEXTURE_H__
 #define __TEXTURE_H__
 
-#include "Vector.h"
-#include "Matrix.h"
+#include "inc/geometry/Vector.h"
+#include "inc/geometry/Matrix.h"
 
 using namespace Core;
 
