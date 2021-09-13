@@ -3,7 +3,7 @@
 
 #include "Vector.h"
 
-namespace core {
+namespace Core {
 	//N cols, M rows
 	template<typename T, std::size_t N, size_t M>
 	class Matrix {

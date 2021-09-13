@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <array>
 
-namespace core {
+namespace Core {
 	template<bool Cond, typename T = void> struct enable_if {};
 	template<typename T> struct enable_if<true, T> { using type = T; };
 
@@ -26,10 +26,10 @@ namespace core {
 	public:
 		using ArrayType = std::array<T, N>;
 		// ctors
-		Vector() :_pdata(std::make_unique<ArrayType>(ArrayType({}))) { }
-		Vector(ArrayType arr) : _pdata(std::make_unique<ArrayType>(arr)) { }
-		Vector(ArrayType&& arr) : _pdata(std::make_unique<ArrayType>(std::move(arr))) { }
-		explicit Vector(std::initializer_list<T> il) : _pdata(std::make_unique<ArrayType>(ArrayType()))
+		Vector() :_pdata(std::make_unique<ArrayType>(ArrayType({}))), _index(0) { }
+		Vector(ArrayType arr) : _pdata(std::make_unique<ArrayType>(arr)), _index(0) { }
+		Vector(ArrayType&& arr) : _pdata(std::make_unique<ArrayType>(std::move(arr))), _index(0) { }
+		explicit Vector(std::initializer_list<T> il) : _pdata(std::make_unique<ArrayType>(ArrayType())), _index(0)
 		{
 			std::size_t i = 0;
 			for (auto iter = il.begin(); iter != il.end(); ++iter)
@@ -38,13 +38,13 @@ namespace core {
 
 		// 注意Rule of Three
 		// copy ctor
-		Vector(const Vector& rhs) : _pdata(std::make_unique<ArrayType>(ArrayType()))
+		Vector(const Vector& rhs) : _pdata(std::make_unique<ArrayType>(ArrayType())), _index(rhs._index)
 		{
 			for (auto i = 0; i < N; i++)
 				(*_pdata)[i] = (*rhs._pdata)[i];
 		}
 		// move ctor
-		Vector(Vector&& rhs) noexcept : _pdata(std::move(rhs._pdata)) { }
+		Vector(Vector&& rhs) noexcept : _pdata(std::move(rhs._pdata)), _index(rhs._index) { }
 		//dctor
 		~Vector() noexcept = default;
 		//copy assignment
@@ -52,12 +52,14 @@ namespace core {
 		{
 			for (auto i = 0; i < N; i++)
 				(*_pdata)[i] = (*rhs._pdata)[i];
+			_index = rhs._index;
 			return *this;
 		}
 
 		Vector& operator=(Vector&& rhs) noexcept
 		{
 			_pdata = std::move(rhs._pdata);
+			_index = rhs._index;
 			return *this;
 		}
 
@@ -154,6 +156,10 @@ namespace core {
 		template<typename _Mul>
 		Vector operator*(_Mul n) const { return Vector(*this) * n; }
 
+		//用于输入
+		Vector& operator<<(const T& val);
+		Vector& operator,(const T& val);
+
 		//简单算法
 		T magnitude()
 		{
@@ -178,6 +184,7 @@ namespace core {
 	private:
 		//std::array<T, N> _data;
 		std::unique_ptr<std::array<T, N>> _pdata;
+		std::size_t _index;
 	};
 
 	template<typename T, std::size_t N>
@@ -192,6 +199,21 @@ namespace core {
 			os << "(null)";
 		}
 		return os;
+	}
+
+	template<typename T, std::size_t N>
+	inline Vector<T, N>& Vector<T, N>::operator<<(const T& val)
+	{
+		(*_pdata)[_index] = val;
+		return *this;
+	}
+
+	template<typename T, std::size_t N>
+	inline Vector<T, N>& Vector<T, N>::operator,(const T& val)
+	{
+		(*_pdata)[++_index] = val;
+		if (_index == N) _index = 0;
+		return *this;
 	}
 
 	typedef Vector<float, 2> Vector2f;

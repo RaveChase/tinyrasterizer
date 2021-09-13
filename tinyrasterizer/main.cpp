@@ -2,7 +2,7 @@
 #include "inc/geometry/Matrix.h"
 #include <iostream>
 
-using namespace core;
+using namespace Core;
 using std::cout;
 using std::cin;
 using std::endl;
